@@ -15,7 +15,6 @@ func ConfigCmd(options *root.GlobalOptions) *cobra.Command {
  harborctl config alias name -a ALIAS
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			_ = cmd.Usage()
 		},
 	}
 

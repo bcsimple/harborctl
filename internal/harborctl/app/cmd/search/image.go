@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/root"
 	"github.com/bcsimple/harborctl/pkg/client"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -28,6 +29,7 @@ For example:
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) < 1 {
 				fmt.Println("has not enough analysis!!")
+				os.Exit(1)
 			}
 			if err := client.NewImage(options).SearchAll(args[0]); err != nil {
 				panic(err)

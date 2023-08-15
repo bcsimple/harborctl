@@ -8,6 +8,7 @@ import (
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/root"
 	"github.com/bcsimple/harborctl/pkg/client"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func ChartCmd(options *root.GlobalOptions) *cobra.Command {
@@ -26,6 +27,7 @@ For example:
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) < 1 {
 				fmt.Println("has not enough analysis!!")
+				os.Exit(1)
 			}
 
 			if err := client.NewChart(options).SearchChart(args[0]); err != nil {

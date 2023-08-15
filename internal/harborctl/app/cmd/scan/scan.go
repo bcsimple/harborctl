@@ -1,12 +1,13 @@
 package scan
 
 import (
+	"fmt"
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/root"
 	"github.com/bcsimple/harborctl/pkg/action"
 	"github.com/bcsimple/harborctl/pkg/client"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"io"
+	"os"
 )
 
 type scanOptions struct {
@@ -37,14 +38,16 @@ func ScanCmd(options *root.GlobalOptions) *cobra.Command {
 	command.Flags().StringVarP(&opts.release, "release", "r", "paas_v20230101", "panji release")
 	command.Flags().SortFlags = false
 	_ = command.MarkFlagRequired("path")
-	if !opts.WithFile && !opts.WithCompare && !opts.WithCompareOnlyFalse {
-		pflag.Usage()
-	}
 
 	return command
 }
 
 func (c *scanOptions) run(args []string, stdout io.Writer) error {
+
+	if !c.WithFile && !c.WithCompare && !c.WithCompareOnlyFalse {
+		fmt.Println("-F or -C or -d must be provided")
+		os.Exit(1)
+	}
 	scan := client.NewScanImage(c.global, c.WithFile, c.WithCompare, c.WithCompareOnlyFalse, c.path, c.release)
 	if c.WithFile {
 		scan.PrintFile()

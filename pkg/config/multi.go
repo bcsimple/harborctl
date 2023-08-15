@@ -54,14 +54,14 @@ func (c *ConnectConfiguration) GetConnectInfo(name string) (*HarborConnectInfo, 
 	if _, info, err := c.getConnectInfoByNameOrAlias(name); err == nil {
 		return info, nil
 	}
-	return &HarborConnectInfo{}, errors.New("get connect info failed ")
+	return &HarborConnectInfo{}, fmt.Errorf("Get connect info [ %s ] failed\n", name)
 }
 
 func (c *ConnectConfiguration) GetDefaultConnectInfo() *HarborConnectInfo {
 	info, err := c.GetConnectInfo(c.CurrentContext)
 	if err != nil {
 		fmt.Println("get default connect info failed")
-		panic(err)
+		os.Exit(1)
 	}
 	return info
 }
@@ -178,7 +178,7 @@ func (c *ConnectConfiguration) List(style string, onlyName, isDecrypt bool) {
 			data = append(data, []string{strconv.Itoa(i), info.Name})
 			continue
 		}
-		data = append(data, []string{strconv.Itoa(i), info.Name, info.Host, info.User, pass, strings.Join(info.Alias, ",")})
+		data = append(data, []string{strconv.Itoa(i + 1), info.Name, info.Host, info.User, pass, strings.Join(info.Alias, ",")})
 	}
 	if onlyName {
 		title = []string{"序号", "名字"}

@@ -60,7 +60,7 @@ func NewHarborClient(options *root.GlobalOptions) *harborClient {
 	if options.Context != "" {
 		var err error
 		if info, err = clientConfig.GetConnectInfo(options.Context); err != nil {
-			fmt.Println(err)
+			fmt.Print(err)
 			os.Exit(1)
 		}
 	}

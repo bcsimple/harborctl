@@ -19,7 +19,6 @@ func SearchCmd(options *root.GlobalOptions) *cobra.Command {
 		Short: "Search some resources  ",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			_ = cmd.Usage()
 		},
 	}
 	command.AddCommand(RegistryCmd(options))
