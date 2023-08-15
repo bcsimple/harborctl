@@ -6,13 +6,11 @@ import (
 )
 
 const (
-	configDir = ".harborctl"
-	//configDir  = "config"
+	configDir  = ".harborctl"
 	configFile = "config.yaml"
 )
 
 var (
-	pathDir = filepath.Join(file.HomeDir(), configDir)
-	//pathDir  = filepath.Join("./", configDir)
+	pathDir  = filepath.Join(file.HomeDir(), configDir)
 	pathFile = filepath.Join(pathDir, configFile)
 )
