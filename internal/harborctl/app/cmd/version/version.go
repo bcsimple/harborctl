@@ -13,7 +13,7 @@ func VersionCmd() *cobra.Command {
 		Use:   "version",
 		Short: "harborctl version",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("harborctl version: \n", version)
+			fmt.Printf("harborctl version: %s\n", version)
 		},
 		Args: cobra.NoArgs,
 	}
