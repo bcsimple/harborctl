@@ -16,4 +16,6 @@
 
 #harborctl
 /harborctl
+/harborctl.sha256
 /harborctl-arm
+/harborctl-arm.sha256
