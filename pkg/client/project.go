@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/root"
 	"github.com/goharbor/go-client/pkg/sdk/v2.0/client/project"
+	"github.com/goharbor/go-client/pkg/sdk/v2.0/client/statistic"
 	"github.com/goharbor/go-client/pkg/sdk/v2.0/models"
 	"os"
 	"strconv"
@@ -14,10 +15,12 @@ import (
 type Project struct {
 	*harborClient
 	searchProjectTitle []string
+	ctx                context.Context
 }
 
 func NewProject(options *root.GlobalOptions) *Project {
 	return &Project{
+		ctx:          context.Background(),
 		harborClient: NewHarborClient(options),
 		searchProjectTitle: []string{
 			"序号",
@@ -78,7 +81,14 @@ func (p *Project) DeleteProject(name string) error {
 }
 
 func (p *Project) SearchProjectsList() error {
-	projects, err := p.Project.ListProjects(context.Background(), &project.ListProjectsParams{})
+	static, err := p.Statistic.GetStatistic(p.ctx, &statistic.GetStatisticParams{})
+	if err != nil {
+		return err
+	}
+
+	projects, err := p.Project.ListProjects(context.Background(), &project.ListProjectsParams{
+		PageSize: &static.Payload.TotalProjectCount,
+	})
 	if err != nil {
 		return err
 	}

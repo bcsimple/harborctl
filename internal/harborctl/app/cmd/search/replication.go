@@ -15,6 +15,7 @@ import (
 type replicationOptions struct {
 	global *root.GlobalOptions
 	rpID   string
+	isAll  bool
 }
 
 func ReplicationCmd(options *root.GlobalOptions) *cobra.Command {
@@ -31,11 +32,17 @@ func ReplicationCmd(options *root.GlobalOptions) *cobra.Command {
 		RunE: action.CommandAction(opts.run),
 	}
 	command.Flags().StringVarP(&opts.rpID, "id", "i", "", "search by replicationID")
+	command.Flags().BoolVarP(&opts.isAll, "all", "a", false, "list projects")
 	return command
 
 }
 
 func (c *replicationOptions) run(args []string, stdout io.Writer) error {
+
+	if c.isAll {
+		return client.NewReplication(c.global).SearchReplicationList()
+	}
+
 	if len(args) != 0 {
 		client.NewReplication(c.global).SearchReplication(args[0])
 	} else if c.rpID != "" {

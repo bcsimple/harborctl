@@ -20,10 +20,12 @@ import (
 type Registry struct {
 	*harborClient
 	registryTitle []string
+	ctx           context.Context
 }
 
 func NewRegistry(options *root.GlobalOptions) *Registry {
 	return &Registry{
+		ctx:          context.Background(),
 		harborClient: NewHarborClient(options),
 		registryTitle: []string{
 			"序号ID",
@@ -35,6 +37,17 @@ func NewRegistry(options *root.GlobalOptions) *Registry {
 			"仓库描述",
 		},
 	}
+}
+
+func (r *Registry) DeleteRegistry(id int64) error {
+	info, err := r.Registry.DeleteRegistry(r.ctx, &registry.DeleteRegistryParams{
+		ID: id,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("registry: [ %s ] delete success\n", info.XRequestID)
+	return nil
 }
 
 func (r *Registry) CreateRegistry() error {
@@ -67,14 +80,17 @@ func (r *Registry) CreateRegistry() error {
 	}
 }
 
-func (r *Registry) CreateRegistryByConfigInfo(name string) error {
+func (r *Registry) CreateRegistryByConfigInfo(name string, replaceName string) error {
 	info, err := config.NewConnectConfiguration().GetConnectInfo(name)
 	if err != nil {
 		return err
 	}
-
+	registryName := info.Name
+	if replaceName != "" {
+		registryName = replaceName
+	}
 	return r.createRegistry(&RegistryInputParams{
-		registryName:        info.Name,
+		registryName:        registryName,
 		registryUrl:         info.Host,
 		registryDescription: strings.Join(info.Alias, ","),
 		accessKey:           info.User,
@@ -102,10 +118,17 @@ func (r *Registry) createRegistry(params *RegistryInputParams) error {
 		fmt.Println(err.Error())
 		return err
 	}
-	fmt.Println("创建成功! 仓库的id为:", result.XRequestID)
+	fmt.Printf("registry: %s 创建成功! 仓库的id为: %s\n", params.registryName, result.XRequestID)
 	return nil
 }
-func (r *Registry) SearchRegistry(name string) {
+
+func (r *Registry) SearchRegistry(name string) error {
+	params := make(neturl.Values)
+	params.Add("q", fmt.Sprintf("name=~%s", name))
+	return r.searchRegistry(params.Encode())
+}
+
+func (r *Registry) searchRegistry(params string) error {
 	r.URL.Path = RegistryURLPath
 	request, err := http.NewRequest(http.MethodGet, r.URL.String(), nil)
 	if err != nil {
@@ -116,20 +139,22 @@ func (r *Registry) SearchRegistry(name string) {
 	client := &http.Client{}
 	request.SetBasicAuth(r.HarborConnectInfo.User, r.HarborConnectInfo.Password)
 
-	params := make(neturl.Values)
-	params.Add("q", fmt.Sprintf("name=~%s", name))
-
-	request.URL.RawQuery = params.Encode()
+	request.URL.RawQuery = params
 	response, err := client.Do(request)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	registryInfos := make([]*RegistryInfo, 0, 100)
 	decoder := json.NewDecoder(response.Body)
-	if err := decoder.Decode(&registryInfos); err != nil {
-		panic(err)
+	if err = decoder.Decode(&registryInfos); err != nil {
+		return err
 	}
 	r.print(registryInfos)
+	return nil
+}
+
+func (r *Registry) SearchRegistryList() error {
+	return r.searchRegistry("")
 }
 
 func (r *Registry) SearchRegistryByID(id string, isPrint bool) (*models.Registry, error) {

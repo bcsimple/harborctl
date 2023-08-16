@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/config"
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/create"
+	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/delete"
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/download"
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/root"
 	"github.com/bcsimple/harborctl/internal/harborctl/app/cmd/scan"
@@ -33,6 +34,7 @@ create by zhangshun!`,
 		update.UpdateCmd(&g),
 		config.ConfigCmd(&g),
 		scan.ScanCmd(&g),
+		delete.DeleteCmd(&g),
 		version.VersionCmd(),
 		//copy.CopyCmd(),
 	)

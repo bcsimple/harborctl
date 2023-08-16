@@ -14,9 +14,10 @@ import (
 )
 
 type createOptions struct {
-	global       *root.GlobalOptions
-	registryID   string
-	registryName string
+	global              *root.GlobalOptions
+	registryID          string
+	registryName        string
+	registryReplaceName string
 	//create pull module policy
 	isReplicationPullPolicy bool
 }
@@ -38,6 +39,7 @@ func CreateCmd(options *root.GlobalOptions) *cobra.Command {
 	}
 	command.Flags().StringVarP(&opts.registryID, "id", "i", "", "when create replication must set this registryID")
 	command.Flags().StringVarP(&opts.registryName, "name", "n", "", "when create registry must set this name(or alias) from harbor config")
+	command.Flags().StringVarP(&opts.registryReplaceName, "replace-name", "", "", "when create registry indicate a name for replace origin name ")
 	command.Flags().BoolVarP(&opts.isReplicationPullPolicy, "pull", "p", false, "when create replication default pushed module,pulled module if true")
 	return command
 }
@@ -52,7 +54,7 @@ func (c *createOptions) run(args []string, stdout io.Writer) error {
 		if c.registryName == "" {
 			return client.NewRegistry(c.global).CreateRegistry()
 		}
-		return client.NewRegistry(c.global).CreateRegistryByConfigInfo(c.registryName)
+		return client.NewRegistry(c.global).CreateRegistryByConfigInfo(c.registryName, c.registryReplaceName)
 	case "replication":
 		return client.NewReplication(c.global).CreateReplication(c.registryID, c.isReplicationPullPolicy)
 	case "project":

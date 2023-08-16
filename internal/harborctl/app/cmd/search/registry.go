@@ -14,6 +14,7 @@ import (
 type registryOptions struct {
 	global *root.GlobalOptions
 	rID    string
+	isAll  bool
 }
 
 func RegistryCmd(options *root.GlobalOptions) *cobra.Command {
@@ -30,14 +31,22 @@ func RegistryCmd(options *root.GlobalOptions) *cobra.Command {
 	}
 
 	command.Flags().StringVarP(&opts.rID, "id", "i", "", "search by registryID")
+	command.Flags().BoolVarP(&opts.isAll, "all", "a", false, "list projects")
 	return command
 }
 
 func (c *registryOptions) run(args []string, stdout io.Writer) error {
+	if c.isAll {
+		return client.NewRegistry(c.global).SearchRegistryList()
+	}
+
 	if len(args) != 0 {
-		client.NewRegistry(c.global).SearchRegistry(args[0])
+		return client.NewRegistry(c.global).SearchRegistry(args[0])
 	} else if c.rID != "" {
-		client.NewRegistry(c.global).SearchRegistryByID(c.rID, true)
+		_, err := client.NewRegistry(c.global).SearchRegistryByID(c.rID, true)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

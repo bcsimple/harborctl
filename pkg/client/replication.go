@@ -20,10 +20,12 @@ import (
 type Replication struct {
 	*harborClient
 	replicationTitle []string
+	ctx              context.Context
 }
 
 func NewReplication(options *root.GlobalOptions) *Replication {
 	return &Replication{
+		ctx:          context.Background(),
 		harborClient: NewHarborClient(options),
 		replicationTitle: []string{
 			"序号ID",
@@ -82,11 +84,18 @@ func (r *Replication) ModifyReplication(id string) {
 	}
 }
 
-func (r *Replication) SearchReplication(name string) {
+func (r *Replication) SearchReplication(name string) error {
 	if name == "" {
 		fmt.Println("name is empty. please input again!")
-		return
+		return nil
 	}
+
+	params := make(neturl.Values)
+	params.Add("name", name)
+	return r.searchReplication(params.Encode())
+}
+
+func (r *Replication) searchReplication(params string) error {
 
 	url := &neturl.URL{
 		Host: r.HarborConnectInfo.Host,
@@ -103,21 +112,24 @@ func (r *Replication) SearchReplication(name string) {
 	client := &http.Client{}
 
 	request.SetBasicAuth(r.HarborConnectInfo.User, r.HarborConnectInfo.Password)
-	params := make(neturl.Values)
-	params.Add("name", name)
 
-	request.URL.RawQuery = params.Encode()
+	request.URL.RawQuery = params
 	response, err := client.Do(request)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 	registryInfos := make([]*ReplicationInfo, 0, 100)
 	decoder := json.NewDecoder(response.Body)
-	if err := decoder.Decode(&registryInfos); err != nil {
-		panic(err)
+	if err = decoder.Decode(&registryInfos); err != nil {
+		return err
 	}
 	r.printReplicationTable1(registryInfos)
+	return nil
+}
+
+func (r *Replication) SearchReplicationList() error {
+	return r.searchReplication("")
 }
 
 func (r *Replication) GetReplicationInfo(id string) *models.ReplicationPolicy {
@@ -322,10 +334,21 @@ func (r *Replication) CreateReplication(id string, isPull bool) error {
 	}
 	result, err := r.Replication.CreateReplicationPolicy(context.Background(), params)
 	if err != nil {
-		return fmt.Errorf("常见复制策略失败,err: %s\n", err)
+		return fmt.Errorf("创建复制策略失败,err: %s\n", err)
 	}
+	fmt.Printf("replication: %s 创建成功! 复制规则的id为: %s\n", policy.Name, result.XRequestID)
 
-	fmt.Println(result.XRequestID, "创建成功!")
+	return nil
+}
+
+func (r *Replication) DeleteReplication(id int64) error {
+	info, err := r.Replication.DeleteReplicationPolicy(r.ctx, &replication.DeleteReplicationPolicyParams{
+		ID: id,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("replication: [ %s ] delete success\n", info.XRequestID)
 	return nil
 }
 
