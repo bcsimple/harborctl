@@ -17,8 +17,8 @@ wget -cP /usr/local/bin https://github.com/bcsimple/harborctl/releases/download/
 #IP:PORT 指定该harbor服务器地址和端口必须带上端口
 
 #注意仓库可以添加多个 但是名字必须唯一 不然会报错
-harborctl config set NAME -s IP:PORT -u USER -p PASSWD 
-harborctl config set harbor01 -s 10.0.0.1:1121 -u admin p Harbor12345
+harborctl config set-context NAME -s IP:PORT -u USER -p PASSWD 
+harborctl config set-context harbor01 -s 10.0.0.1:1121 -u admin p Harbor12345
 #查看
 harborctl config view 
 ```
