@@ -32,6 +32,7 @@ For example:
 				os.Exit(1)
 			}
 			if err := client.NewImage(options).SearchAll(args[0]); err != nil {
+				fmt.Println(err)
 				panic(err)
 			}
 		},

@@ -21,7 +21,7 @@ func SetCmd(options *root.GlobalOptions) *cobra.Command {
 		Use:   "set-context",
 		Short: "set current context name for harbor",
 		Long: `For example:
- harborctl config set NAME -u USER -p PASSWORD -h HOST -a ALIAS`,
+ harborctl config set NAME -u USER -p PASSWORD -s HOST -a ALIAS`,
 		RunE: action.CommandAction(opts.run),
 		Args: cobra.ExactArgs(1),
 	}
@@ -30,6 +30,7 @@ func SetCmd(options *root.GlobalOptions) *cobra.Command {
 	command.Flags().StringVarP(&opts.HarborConnectInfo.User, "user", "u", "", "set context name for connection")
 	command.Flags().StringVarP(&opts.HarborConnectInfo.Password, "password", "p", "", "set context name for connection")
 	command.Flags().StringArrayVarP(&opts.HarborConnectInfo.Alias, "alias", "a", []string{}, "set context name for connection")
+	command.Flags().MarkHidden("name")
 	//_ = command.MarkFlagRequired("host")
 	//_ = command.MarkFlagRequired("user")
 	//_ = command.MarkFlagRequired("password")

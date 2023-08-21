@@ -10,7 +10,7 @@ func ConfigCmd(options *root.GlobalOptions) *cobra.Command {
 		Use:   "config",
 		Short: "config harbor context when we use harborctl ",
 		Long: `For example:
- harborctl config set NAME -u USER -p PASSWORD -h HOST -a ALIAS 
+ harborctl config set NAME -u USER -p PASSWORD -s HOST -a ALIAS 
  harborctl config use-context name
  harborctl config alias name -a ALIAS
 `,
